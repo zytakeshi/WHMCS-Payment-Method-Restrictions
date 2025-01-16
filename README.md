@@ -35,7 +35,7 @@ Example code:
         const dropdown = document.getElementById('paymentMethodDropdown');
 
         dropdown.addEventListener('change', function (event) {
-            const confirmChange = confirm('Changing your payment method may cause delays. Do you want to proceed?');
+            const confirmChange = confirm('{$LANG.paymentmethod}');
             if (!confirmChange) {
                 // Reset to previous value if the user cancels
                 dropdown.value = dropdown.getAttribute('data-default');
@@ -50,7 +50,21 @@ Example code:
 </script>
 ```
 
-### Step 3: Test Your Changes
+### Step 3: Update the Language Key
+
+Make sure the language key `$LANG.paymentmethod` is updated or created in your WHMCS language override file. 
+
+1. Navigate to your WHMCS installation path: `whmcsinstallationpath/lang/override/`
+2. Open or create the appropriate language file for your default language (e.g., `english.php`).
+3. Add or update the following entry:
+
+```php
+$_LANG['paymentmethod'] = 'Changing your payment method may cause delays. Do you want to proceed?';
+```
+
+You can choose to customize the text or add a new language key. Just ensure it is saved in your language file.
+
+### Step 4: Test Your Changes
 
 After saving the template file, visit the invoice page and attempt to change the payment method. The pop-up should appear.
 
@@ -78,7 +92,7 @@ Locate the section rendering the payment method dropdown and disable it:
 <div class="form-group">
     <label for="inputPaymentMethod" class="control-label">{$LANG.paymentmethod}</label>
     <select name="paymentmethod" id="inputPaymentMethod" class="form-control" disabled>
-        <option value="{$defaultpaymentmethod}" selected="selected">[Default Payment Method]</option>
+        <option value="{$defaultpaymentmethod}" selected="selected">[{$LANG.paymentmethoddefault}]</option>
         {foreach from=$paymentmethods item=method}
             <option value="{$method.sysname}"{if $method.sysname eq $defaultpaymentmethod} selected="selected"{/if}>{$method.name}</option>
         {/foreach}
@@ -89,38 +103,6 @@ Locate the section rendering the payment method dropdown and disable it:
 
 This disables the dropdown and ensures the default payment method is retained.
 
-### Option 2: Use a WHMCS Hook
-
-To enforce restrictions programmatically, create a hook:
-
-#### Step 1: Create the Hook File
-
-Create a new file in `/includes/hooks/` named `restrict_payment_method.php`.
-
-#### Step 2: Add the Hook Code
-
-```php
-<?php
-
-use WHMCS\Database\Capsule;
-
-add_hook('ClientEdit', 1, function ($vars) {
-    $clientId = $vars['userid'];
-    $originalPaymentMethod = Capsule::table('tblclients')
-        ->where('id', $clientId)
-        ->value('defaultgateway');
-
-    if (isset($vars['paymentmethod']) && $vars['paymentmethod'] !== $originalPaymentMethod) {
-        throw new \WHMCS\Exception\Fatal('You cannot change your default payment method. Please contact support for assistance.');
-    }
-});
-```
-
-This hook ensures the default payment method cannot be changed via the client area or API.
-
-### Step 3: Test Your Hook
-
-Save the file and attempt to update the payment method on the "Account Details" page. The system should block any changes and display the error message.
 
 ---
 
