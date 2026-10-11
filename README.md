@@ -54,7 +54,7 @@ Example code:
 
 Make sure the language key `$LANG.paymentmethod` is updated or created in your WHMCS language override file. 
 
-1. Navigate to your WHMCS installation path: `whmcsinstallationpath/lang/override/`
+1. Navigate to your WHMCS installation path: `whmcsinstallationpath/lang/overrides/` (see the [WHMCS language override guide](https://developers.whmcs.com/languages/overrides/)).
 2. Open or create the appropriate language file for your default language (e.g., `english.php`).
 3. Add or update the following entry:
 
@@ -101,7 +101,9 @@ Locate the section rendering the payment method dropdown and disable it:
 </div>
 ```
 
-This disables the dropdown and ensures the default payment method is retained.
+This disables the dropdown in the rendered page and submits the current value
+through a hidden input. Both can be changed by the client, so this is a UI
+restriction only. This repository does not supply a server-side enforcement hook.
 
 
 ---
@@ -111,6 +113,7 @@ This disables the dropdown and ensures the default payment method is retained.
 By following these steps, you can:
 
 1. Add a confirmation pop-up for changing payment methods.
-2. Disallow changes to the default payment method on the "Account Details" page.
+2. Disable the default payment method selector on the "Account Details" page.
 
-These changes enhance the reliability and security of payment configurations in WHMCS. If you have any questions or run into issues, feel free to contact support or leave a comment.
+Enforcing a payment-method policy requires server-side validation in addition
+to these template changes.
